@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  consumer:
+    build: ./rabbitmq/applications/consumer/
+    environment:
+      - RABBIT_HOST=rabbit-1
+      - RABBIT_PORT=5672
+      - RABBIT_USERNAME=guest
+      - RABBIT_PASSWORD=guest
+    networks:
+      - default
+    depends_on:
+      - rabbitmq
+    restart: always
+
+
+  publisher:
+    build: .rabbitmq/applications/publisher/
+    environment:
+      - RABBIT_HOST=rabbit-1
+      - RABBIT_PORT=5672
+      - RABBIT_USERNAME=guest
+      - RABBIT_PASSWORD=guest
+    ports:
+    - "3000:3000"
+    networks:
+      - default
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    hostname: rabbit-1
+    ports:
+    - "8080:15672"
+    networks:
+      - default
+    restart: always
+
+
+networks:
+  default:
+    external: true
+    name: rabbits
+
+
+
+# docker run -d --rm --net rabbits -p 8080:15672 --hostname rabbit-manager --name rabbit-manager rabbitmq:3.8-management
